@@ -25,5 +25,4 @@ public class RecipeService {
         String regex = "(?i).*" + searchTerm + ".*";
         return recipeRepository.findByNameRegexIgnoreCase(regex);
     }
-
 }
