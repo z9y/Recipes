@@ -5,8 +5,7 @@ import com.z9y.recipes.repositories.RecipeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RecipeService {
@@ -25,4 +24,9 @@ public class RecipeService {
         String regex = "(?i).*" + searchTerm + ".*";
         return recipeRepository.findByNameRegexIgnoreCase(regex);
     }
+
+//    public List<Recipe> searchByIngredient(List<Map<String, Object>> ingredients) {
+//        return recipeRepository.findByIngredientsContaining(ingredients);
+//    }
+
 }
