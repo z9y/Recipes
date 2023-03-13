@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface RecipeRepository extends MongoRepository<Recipe, String> {
     List<Recipe> findByNameRegexIgnoreCase(String searchTerm);
     Optional<Recipe> findRecipeByRecipeId(String recipeId);
+
+    Recipe findById(String id, Class<Recipe> recipeClass);
 }

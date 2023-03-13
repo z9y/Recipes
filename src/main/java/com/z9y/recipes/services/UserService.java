@@ -8,11 +8,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -27,7 +26,10 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
 
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getAuthorities(user.getRoles()));
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                getAuthorities(user.getRoles()));
     }
 
     private List<GrantedAuthority> getAuthorities(List<String> roles) {
@@ -36,5 +38,28 @@ public class UserService implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority(role));
         }
         return authorities;
+    }
+
+    public boolean userExists(String username) {
+        User user = userRepository.findByUsername(username);
+        return user != null;
+    }
+
+    public User createUser(String username, String password) {
+        User existingUser = userRepository.findByUsername(username);
+        if (existingUser != null) {
+            throw new RuntimeException("User already exists");
+        }
+
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(new BCryptPasswordEncoder().encode(password));
+        user.setRoles(List.of("USER"));
+
+        return userRepository.save(user);
+    }
+
+    public boolean checkUserPassword(String username, String password) {
+        return userRepository.findByUsername(username) != null;
     }
 }

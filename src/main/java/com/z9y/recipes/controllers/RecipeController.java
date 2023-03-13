@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.*;
 
 @RestController
@@ -36,4 +37,39 @@ public class RecipeController {
         }
     }
 
+    @PostMapping
+    public ResponseEntity<Recipe> createRecipe(@RequestBody Recipe recipe) {
+        Recipe createdRecipe = recipeService.createRecipe(recipe);
+        return ResponseEntity.created(URI.create("/api/v1/recipes/" + createdRecipe.getId())).body(createdRecipe);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Recipe> updateRecipe(@PathVariable String id, @RequestBody Recipe recipe) {
+        Optional<Recipe> existingRecipe = recipeService.getRecipe(id);
+        if (existingRecipe.isPresent()) {
+            Recipe updatedRecipe = existingRecipe.get();
+            updatedRecipe.setName(recipe.getName());
+            updatedRecipe.setCategory(recipe.getCategory());
+            updatedRecipe.setTag(recipe.getTag());
+            updatedRecipe.setImage(recipe.getImage());
+            updatedRecipe.setLink(recipe.getLink());
+            updatedRecipe.setFeatured(recipe.isFeatured());
+            updatedRecipe.setDetails(recipe.getDetails());
+            updatedRecipe.setIngredients(recipe.getIngredients());
+            updatedRecipe.setPreparation(recipe.getPreparation());
+            updatedRecipe.setMacro(recipe.getMacro());
+            updatedRecipe.setReviewIds(recipe.getReviewIds());
+            recipeService.updateRecipe(updatedRecipe);
+            return ResponseEntity.ok(updatedRecipe);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRecipe(@PathVariable String id) {
+        recipeService.deleteRecipeById(id);
+        return ResponseEntity.noContent().build();
+    }
 }
